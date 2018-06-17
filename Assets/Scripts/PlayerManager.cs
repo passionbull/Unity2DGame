@@ -5,23 +5,24 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour {
 
-    Animator anim;
-    Rigidbody2D rb;
-
     public float speedX;
     public float jumpSpeedY;
     public float delayBeforeDoubleJump;
+    public GameObject leftBullet, rightBullet;
 
     bool facingRight, Jumping, isGrounded, canDoubleJump;
     float speed;
+    Transform firePos;
 
+    Animator anim;
+    Rigidbody2D rb;
 
     // Use this for initialization
     void Start () {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
-
         facingRight = true;
+        firePos = transform.Find("firePos");
     }
 
     // Update is called once per frame
@@ -29,11 +30,12 @@ public class PlayerManager : MonoBehaviour {
         Flip();
         MovePlayer(speed);
         HandleJump();
-        if(Input.GetKeyDown(KeyCode.LeftArrow))
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             speed = -speedX;
         }
-        if(Input.GetKeyUp(KeyCode.LeftArrow))
+        if (Input.GetKeyUp(KeyCode.LeftArrow))
         {
             speed = 0;
         }
@@ -46,25 +48,52 @@ public class PlayerManager : MonoBehaviour {
         {
             speed = 0;
         }
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            speed = -speedX;
+        }
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            speed = 0;
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            speed = +speedX;
+        }
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            speed = 0;
+        }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             Jump();
-            //Jumping = true;
-            //rb.AddForce(new Vector2(rb.velocity.x, jumpSpeedY)); //add particular direction
-            //anim.SetInteger("State", 3);
         }
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            Fire();
+        }
+
+    }
+
+    private void Fire()
+    {
+        if(facingRight)
+            Instantiate(rightBullet, firePos.position, Quaternion.identity);
+        else
+            Instantiate(leftBullet, firePos.position, Quaternion.identity);
+
     }
 
     private void HandleJump()
     {
         if(Jumping)
         {
-            if (rb.velocity.y > 0) //moving up!!
+            if (rb.velocity.y > 0) // moving up
             {
                 anim.SetInteger("State", 3);
             }
-            else
+            else // moving down
             {
                 anim.SetInteger("State", 1);
             }
